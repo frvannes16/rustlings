@@ -16,12 +16,31 @@
 //
 // Execute `rustlings hint box1` for hints :)
 
-// I AM NOT DONE
+
+use std::fmt;
 
 #[derive(PartialEq, Debug)]
 pub enum List {
-    Cons(i32, List),
+    Cons(i32, Box<List>),
     Nil,
+}
+
+impl fmt::Display for List {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut curr_list = self;
+        let mut result: fmt::Result = Ok(());
+        write!(f, "[");
+        while let List::Cons(num, next) = curr_list {
+            write!(f, "{}", num)?;
+            if let List::Cons(_,_) = **next {
+                write!(f, ", "); // append comma separator if there are more elements
+            }
+            curr_list = next;
+        }
+        write!(f, "]")
+
+        
+    }
 }
 
 fn main() {
@@ -33,11 +52,11 @@ fn main() {
 }
 
 pub fn create_empty_list() -> List {
-    unimplemented!()
+    List::Nil
 }
 
 pub fn create_non_empty_list() -> List {
-    unimplemented!()
+    List::Cons(10, Box::new(List::Cons(12, Box::new(List::Nil))))
 }
 
 #[cfg(test)]
@@ -46,11 +65,14 @@ mod tests {
 
     #[test]
     fn test_create_empty_list() {
-        assert_eq!(List::Nil, create_empty_list())
+        assert_eq!(List::Nil, create_empty_list());
+        assert_eq!(format!("{}", create_empty_list()), "[]");
     }
 
     #[test]
     fn test_create_non_empty_list() {
-        assert_ne!(create_empty_list(), create_non_empty_list())
+        assert_ne!(create_empty_list(), create_non_empty_list());
+        assert_eq!(format!("{}", create_non_empty_list()), "[10, 12]");
+
     }
 }
